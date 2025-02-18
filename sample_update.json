@@ -1,0 +1,40 @@
+[
+    {
+        "mode": "item",
+        "update": {
+            "name": "<name>",
+            "description": "<description>",
+            "location": "<location>"
+        }
+    },
+    {
+        "mode": "location",
+        "update": {
+            "name": "<name>",
+            "description": "<description>",
+            "area": "<area>"
+        }
+    },
+    {
+        "mode": "character",
+        "update": {
+            "name": "<name>",
+            "description": "<description>",
+            "location": "<location>",
+            "inventory": []
+        }
+    },
+    {
+        "mode": "player",
+        "update": {
+            "description": "<description>",
+            "location": "<location>",
+            "inventory": [
+                {
+                    "item": "<name>",
+                    "description": "<description>"
+                }
+            ]
+        }
+    }
+]
