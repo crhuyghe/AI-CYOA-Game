@@ -25,16 +25,33 @@
         }
     },
     {
-        "mode": "player",
+        "mode": "player-item-remove",
+        "update": {
+                "items": [
+                    "<item-1>", "<item-2>"
+                ]
+        }
+    },
+    {
+        "mode": "player-item-add",
+        "update": {
+                "items": [
+                    {
+                        "name": "<item-1>",
+                        "description": "<description>"
+                    },
+                    {
+                        "name": "<item-2>",
+                        "description": "<description>"
+                    }
+                ]
+        }
+    },
+    {
+        "mode": "player-status",
         "update": {
             "description": "<description>",
-            "location": "<location>",
-            "inventory": [
-                {
-                    "item": "<name>",
-                    "description": "<description>"
-                }
-            ]
+            "location": "<location>"
         }
     }
 ]

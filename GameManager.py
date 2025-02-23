@@ -13,11 +13,15 @@ class GameManager:
         self._client = OpenAI(api_key=api_key)
         self._prompts = {}  # Include prompts for the AI model
 
+        self.current_story = []
+
     def select_game(self, index):
         """Sets the story index and performs initialization steps"""
         self.running_data = self._story_data[index]
         self.action_number = 8
-        return self.running_data["introduction"]
+
+        self.current_story.append(self.running_data["introduction"])
+        return self.current_story[0]
 
     def next_action(self, action):
         """Progresses the game to the next action"""
@@ -33,6 +37,10 @@ class GameManager:
 
     def generate_conclusion(self):
         """Attempts to wrap up the story."""
+
+    def reset_game(self):
+        self.current_story = []
+        self.running_data = None
 
     def _prompt_ai(self, messages):
         completion = self._client.chat.completions.create(
