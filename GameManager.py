@@ -18,6 +18,7 @@ class GameManager:
         self.characters = []
         self.player_data = {}
         self.map_data = {}
+        self._conclusion = ""
 
 
     def select_game(self, index):
@@ -30,11 +31,11 @@ class GameManager:
         self.player_data = running_data["player"]
         self.items = running_data["objects"]
         self.characters = running_data["characters"]
+        self._conclusion = running_data["conclusion"]
         return self.current_story[0]
 
     async def next_action(self, action):
         """Progresses the game to the next action"""
-
         # Perform validation of action first
         valid, consistent = await self._validate_action(action)
 
@@ -44,19 +45,19 @@ class GameManager:
                 interpreted_action = await self._interpret_action(action)
 
                 # Prompt AI for immediate consequences of action
-                output = await self._interpret_outcome(interpreted_action)
+                output = await self._interpret_outcome(action, interpreted_action)
 
                 # Perform item, map, and character update checks
                 await self._update_story_params(interpreted_action, output)
 
             else:  # Action is valid, but contradicts the story
-                interpreted_action = ""
+                interpreted_action = None
                 output = await self._failed_action(action)
 
-        else:  # Action is not valid
-            action = "I stand in place, doing nothing"
+        else:  # Action is not valid. This is invariably the result of a user trying to abuse the AI.
+            action = "I stand in place, accomplishing nothing."
             interpreted_action = await self._interpret_action(action)
-            output = await self._interpret_outcome(interpreted_action)
+            output = await self._interpret_outcome(action, interpreted_action)
 
 
 
@@ -76,9 +77,31 @@ class GameManager:
 
     async def _interpret_action(self, action):
         """Takes an action and uses the AI to fit it into the story."""
+        return (await self._prompt_ai([
+            {
+                "role": "system",
+                "content": f'Your job is to review the user action and rewrite it to fit the story, given the story and story information you have been provided. It is not your job to decide whether the user\'s action makes sense. Make sure the specifics of the user\'s action are captured in your rewritten version. Try to be concise, limiting the interpretation to two or three sentences. Use the character, location, and object information provided in the Story Information section. If the action references characters, locations, or objects not already present in the Story Information section, work them in however appropriate, but do not invent additional story elements if it can be avoided.\n\nStory Information: \n{self.get_story_status(conclusion=False)}\n\nStory: \n```{"\n".join(self.current_story)}```'
+            },
+            {
+                "role": "user",
+                "content": action
+            }
+        ])).choices[0].message.content
 
-    async def _interpret_outcome(self, action):
+
+    async def _interpret_outcome(self, action, interpreted_action):
         """Takes an action and uses the AI to generate the logical progression in the story."""
+        return (await self._prompt_ai([
+            {
+                "role": "system",
+                "content": f'Your job is to continue the story by detailing the immediate consequences of the user\'s action, and nothing further. If the action references characters, locations, or objects not already present in the Story Information section, work them in however appropriate, but do not invent additional story elements if it can be avoided. Limit the response to three sentences. If there are no immediate consequences of the user\'s action, indicate as much. Do not repeat the user action.\n\nStory Information: \n{self.get_story_status()}\n\nStory: \n```{"\n".join(self.current_story)}```'
+            },
+            {
+                "role": "user",
+                "content": f"Action: {action}\nAI interpretation: {interpreted_action}"
+            }
+        ])).choices[0].message.content
+
 
     async def _update_story_params(self, action, output):
         """Updates the parameters of the story to reflect the latest outcomes."""
@@ -86,7 +109,18 @@ class GameManager:
     async def _failed_action(self, action):
         """Takes an action and generates an outcome illustrating that the action failed to occur."""
 
-    def get_story_status(self):
+        return (await self._prompt_ai([
+            {
+                "role": "system",
+                "content": f'The user action below has been deemed inconsistent and impossible to fit in the story, likely because it has contradicted data from the Story Information section or the plot line itself. Continue the story by detailing how the player tried to execute the action, but work in the story information that was contradicted to ensure that nothing happens, either by indicating how the player remembered the contradicted detail, or by having the player fail spectacularly due to the contradicted detail. Limit your response to one or two sentences.\n\nStory Information: \n{self.get_story_status(conclusion=False)}\n\nStory: \n```{"\n".join(self.current_story)}```'
+            },
+            {
+                "role": "user",
+                "content": f"{action}"
+            }
+        ])).choices[0].message.content
+
+    def get_story_status(self, conclusion=True):
         status = f"Player Character:\n\nname: {self.player_data['name']}\nlocation: {self.player_data['location']}\ndescription: {self.player_data['description']}"
         if len(self.player_data['inventory']) > 0:
             status += f"\nPlayer Inventory:"
@@ -110,6 +144,9 @@ class GameManager:
             for i in range(len(self.characters)):
                 character = self.characters[i]
                 status += f"\n\ncharacter {i+1}: {character['name']}\nlocation: {character['location']}\ndescription: {character['description']}"
+
+        if conclusion:
+            status += f"\n\nIntended Conclusion: \n```{self._conclusion}```"
 
         return status
 
@@ -178,7 +215,9 @@ class GameManager:
             valid_check, consistent_check = await asyncio.gather(valid_check, consistent_check)
             return (valid_check.choices[0].message.content == "Valid",
                     consistent_check.choices[0].message.content == "Consistent")
-        except:
+        except Exception as e:
+            print(e)
+            print(e.__traceback__)
             return False, False
 
     def _prompt_ai(self, messages):
@@ -189,3 +228,17 @@ class GameManager:
         )
         # return completion.choices[0].message.content
         return completion
+
+
+gm = GameManager(api_key="<key>")
+gm.select_game(0)
+
+loop = asyncio.new_event_loop()
+response = loop.run_until_complete(gm.next_action("In a puff of smoke, Moe vanished, revealing his true form as a pile of rusty tin cans"))
+print(response[0])
+print(response[1])
+loop.close()
+# print(gm.get_story_status())
+
+# print(gm._validate_action("I grab my fishing rod and go fishing off the pier"))
+
