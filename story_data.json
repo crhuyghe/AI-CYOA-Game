@@ -2,7 +2,7 @@
     {
         "title": "Moe's Fishing Shack",
         "introduction": "Moe pushed open the weathered door of his fishing shack, the wooden floor groaning under his boots as he stepped inside. The air was thick with the familiar scent of lake water, old timber, and the faint tang of motor oil. Tomorrow was the big day—his long-awaited fishing trip on Blackwater Lake. He had been planning it for weeks, prepping bait, patching nets, making sure everything was just right.\n\nAs the evening breeze rustled the trees, Moe stepped outside and made his way toward the shore, where his boat rested on a pair of worn wooden skids. But the moment he crouched down to inspect it, his stomach sank. There, just beneath the bench seat, a jagged hole gaped in the hull.\n\nHe ran a calloused hand over the splintered edges, his brow furrowing. No doubt about it—this boat wasn’t going anywhere in its current state. But one way or another, come sunrise, he was going fishing.\n\nThe night was young, and the shack was filled with tools, scraps, and whatever ingenuity he could muster.\n\nWhat was he going to do?\n",
-        "conclusion": "Out of time to prepare, Moe decided to call it a night and get some rest.\n\nBright and early the next morning, Moe headed out of his shack, determined to get out on that lake one way or another. It's fishing time.",
+        "conclusion": "Out of time to prepare, Moe decided to call it a night and get some rest.\n\nBright and early the next morning, Moe headed out of his shack. There is no time left for planning, fixing, or building. It's fishing time.",
         "map": {
             "name": "Blackwater Lake Surroundings",
             "locations": [
@@ -35,42 +35,42 @@
         },
         "objects": [
             {
-                "item": "Moe's Fishing Boat",
+                "name": "Moe's Fishing Boat",
                 "description": "An old, simple wooden boat with splintered edges. There is a large hole under the bench seat.",
                 "location": "The Dock"
             },
             {
-                "item": "Rope",
+                "name": "Rope",
                 "description": "A sturdy bundle of rope.",
                 "location": "The Dock"
             },
             {
-                "item": "Old lantern",
+                "name": "Old lantern",
                 "description": "A dusty, but functional lantern.",
                 "location": "The Shack"
             },
             {
-                "item": "Rattling Cabinet",
+                "name": "Rattling Cabinet",
                 "description": "A sturdy wooden cabinet. Something seems to want out.",
                 "location": "Moe's Shack"
             },
             {
-                "item": "Toolshelf",
+                "name": "Toolshelf",
                 "description": "An old shelf filled with rusty tools.",
                 "location": "Moe's Shack"
             },
             {
-                "item": "Tackle Box",
+                "name": "Tackle Box",
                 "description": "Moe's tackle box. Filled with bait and tackle, among other things.",
                 "location": "Moe's Shack"
             },
             {
-                "item": "Fishing Nets",
+                "name": "Fishing Nets",
                 "description": "Moe's fishing nets. Recently patched and ready for picking up fish.",
                 "location": "Moe's Shack"
             },
             {
-                "item": "Old Tome",
+                "name": "Old Tome",
                 "description": "A mysterious old book of unknown origin.",
                 "location": "Moe's Shack"
             }
@@ -82,7 +82,7 @@
             "location": "Moe's shack",
             "inventory": [
                 {
-                    "item": "Fishing rod",
+                    "name": "Fishing rod",
                     "description": "Moe's trusty fishing rod. It has caught many a fish in its years."
                 }
             ]
