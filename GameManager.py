@@ -1,3 +1,4 @@
+
 import json
 from openai import AsyncOpenAI
 import asyncio
@@ -353,7 +354,7 @@ class GameManager:
         if len(self.player_data['inventory']) > 0:
             status += f"\nPlayer Inventory:"
             for item in self.player_data['inventory']:
-                status += f"\n\tname: {item['name']}\n\tdescription: {item['description']}"
+                status += f"\n\tname: {item.get('name', item.get('item', 'Unknown'))}\n\tdescription: {item['description']}"
 
         status += f"\n\nStory Setting: {self.map_data['name']}"
         for i in range(len(self.map_data["locations"])):
@@ -364,7 +365,8 @@ class GameManager:
             status += "\n\nObjects outside player inventory:"
             for i in range(len(self.items)):
                 item = self.items[i]
-                item_report = f"\n\nobject {i+1}: {item['name']}\nlocation: {item['location']}\ndescription: {item['description']}"
+                item_report = f"\n\nobject {i+1}: {'item'}\nlocation: {item['location']}\ndescription: {item['description']}"
+
                 status += item_report
 
         if len(self.characters) > 0:
@@ -458,7 +460,7 @@ class GameManager:
         return completion
 
 
-# gm = GameManager(api_key="<key>")
+# gm = GameManager(api_key="key")
 # gm.select_game(0)
 
 # loop = asyncio.new_event_loop()
@@ -466,3 +468,4 @@ class GameManager:
 # print(loop.run_until_complete(gm.generate_conclusion()))
 
 # loop.close()
+ 
