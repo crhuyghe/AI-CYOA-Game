@@ -4,8 +4,8 @@ import asyncio
 from GameManager import GameManager
 
 # Load story data
-# with open("story_data.json", "r") as f:
-#     story_data = json.load(f)
+with open("story_data.json", "r") as f:
+    story_data = json.load(f)
 
 gm = GameManager(api_key="key")
 
@@ -26,7 +26,7 @@ async def next_action(action):
         await gm.generate_conclusion()
         return "\n\n".join(gm.current_story), gr.update(value=""), gr.update()
     else:
-        _, _, is_conclusion = await gm.next_action(action)
+        _, is_conclusion = await gm.next_action(action)
 
         if is_conclusion:
             update = (gr.update(value="", interactive=False), gr.update(value="Finish", interactive=True))

@@ -25,7 +25,7 @@ class GameManager:
     def select_game(self, index):
         """Sets the story index and performs initialization steps"""
         running_data = copy.deepcopy(self._story_data[index])
-        self.action_number = 4
+        self.action_number = 2
 
         self.current_story.append(running_data["introduction"])
         self.map_data = running_data["map"]
@@ -44,38 +44,39 @@ class GameManager:
         if valid:
             if consistent:  # Action is allowed in the story
                 # Prompt AI for story interpretation of action
-                interpreted_action = await self._interpret_action(action)
+                # interpreted_action = await self._interpret_action(action)
 
                 # Prompt AI for immediate consequences of action
-                output = await self._interpret_outcome(action, interpreted_action)
+                output = await self._interpret_outcome(action)
 
                 # Perform item, map, and character update checks
-                await self._update_story_params(interpreted_action, output)
+                await self._update_story_params(action, output)
 
             else:  # Action is valid, but contradicts the story
-                interpreted_action = None
+                # interpreted_action = None
                 output = await self._failed_action(action)
 
         else:  # Action is not valid. This is invariably the result of a user trying to abuse the AI.
             action = "I stand in place, accomplishing nothing."
-            interpreted_action = await self._interpret_action(action)
-            output = await self._interpret_outcome(action, interpreted_action)
+            # interpreted_action = await self._interpret_action(action)
+            output = await self._interpret_outcome(action)
 
         self.action_number -= 1
 
-        if interpreted_action:
-            self.current_story.append(interpreted_action)
+        # if interpreted_action:
+        #     self.current_story.append(interpreted_action)
+        self.current_story.append(action)
         self.current_story.append(output)
 
         # Return AI output and boolean to indicate whether self.action_number is 0
-        return interpreted_action, output, self.action_number == 0
+        return output, self.action_number == 0
 
     async def generate_conclusion(self):
         """Attempts to wrap up the story."""
         conclusion = (await self._prompt_ai([
             {
                 "role": "system",
-                "content": f'Your job is to write the conclusion to the following story. Review the events that have taken place, the items that the player is carrying, and any additional things listed in the story details, and attempt to make the ending reflect the intended conclusion provided by the user. Keep in mind that the user may have failed to write the story in a way that the intended conclusion is possible. If this is the case, write the story so that the player fails to achieve the intended conclusion.\n\nStory Information: \n{self.get_story_status(conclusion=False)}\n\nStory: \n```{"\n".join(self.current_story)}```'
+                "content": f'Your job is to write the conclusion to the following story. Review the events that have taken place, the items that the player is carrying, and any additional things listed in the story details, and attempt to make the ending reflect the intended conclusion provided by the user. Make sure to include that intended conclusion in your output, but keep in mind that the user may have failed to write the story in a way that the intended conclusion is possible. If this is the case, write the story so that the player fails to achieve the intended conclusion.\n\nStory Information: \n{self.get_story_status(conclusion=False)}\n\nStory: \n```{"\n".join(self.current_story)}```'
             },
             {
                 "role": "user",
@@ -107,7 +108,7 @@ class GameManager:
         ])).choices[0].message.content
 
 
-    async def _interpret_outcome(self, action, interpreted_action):
+    async def _interpret_outcome(self, action):
         """Takes an action and uses the AI to generate the logical progression in the story."""
         return (await self._prompt_ai([
             {
@@ -116,7 +117,7 @@ class GameManager:
             },
             {
                 "role": "user",
-                "content": f"Action: {action}\nAI interpretation: {interpreted_action}"
+                "content": action
             }
         ])).choices[0].message.content
 
