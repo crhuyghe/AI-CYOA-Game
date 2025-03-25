@@ -1,4 +1,4 @@
-
+import copy
 import json
 from openai import AsyncOpenAI
 import asyncio
@@ -24,8 +24,8 @@ class GameManager:
 
     def select_game(self, index):
         """Sets the story index and performs initialization steps"""
-        running_data = self._story_data[index]
-        self.action_number = 8
+        running_data = copy.deepcopy(self._story_data[index])
+        self.action_number = 4
 
         self.current_story.append(running_data["introduction"])
         self.map_data = running_data["map"]
@@ -72,7 +72,7 @@ class GameManager:
 
     async def generate_conclusion(self):
         """Attempts to wrap up the story."""
-        return (await self._prompt_ai([
+        conclusion = (await self._prompt_ai([
             {
                 "role": "system",
                 "content": f'Your job is to write the conclusion to the following story. Review the events that have taken place, the items that the player is carrying, and any additional things listed in the story details, and attempt to make the ending reflect the intended conclusion provided by the user. Keep in mind that the user may have failed to write the story in a way that the intended conclusion is possible. If this is the case, write the story so that the player fails to achieve the intended conclusion.\n\nStory Information: \n{self.get_story_status(conclusion=False)}\n\nStory: \n```{"\n".join(self.current_story)}```'
@@ -82,13 +82,16 @@ class GameManager:
                 "content": self._conclusion
             }
         ])).choices[0].message.content
+        self.current_story.append(conclusion)
+        return conclusion
 
     def reset_game(self):
         self.current_story.clear()
-        self.map_data.clear()
-        self.player_data.clear()
-        self.items.clear()
-        self.characters.clear()
+        self.map_data = {}
+        self.player_data = {}
+        self.items = []
+        self.characters = []
+        self._conclusion = ""
 
     async def _interpret_action(self, action):
         """Takes an action and uses the AI to fit it into the story."""
@@ -109,7 +112,7 @@ class GameManager:
         return (await self._prompt_ai([
             {
                 "role": "system",
-                "content": f'Your job is to continue the story by detailing the immediate consequences of the user\'s action, and nothing further. If the action references characters, locations, or objects not already present in the Story Information section, work them in however appropriate, but do not invent additional story elements if it can be avoided. Limit the response to three sentences. If there are no immediate consequences of the user\'s action, indicate as much. Do not repeat the user action.\n\nStory Information: \n{self.get_story_status()}\n\nStory: \n```{"\n".join(self.current_story)}```'
+                "content": f'Your job is to detail how the user\'s action plays out in the context of the story. If the action references characters, locations, or objects not already present in the Story Information section, work them in however appropriate, but do not invent additional story elements if it can be avoided. If there are no immediate consequences of the user\'s action, indicate as much. Do not repeat the user action.\n\nStory Information: \n{self.get_story_status()}\n\nStory: \n```{"\n".join(self.current_story)}```'
             },
             {
                 "role": "user",
@@ -468,4 +471,3 @@ class GameManager:
 # print(loop.run_until_complete(gm.generate_conclusion()))
 
 # loop.close()
- 
