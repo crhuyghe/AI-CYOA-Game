@@ -17,7 +17,7 @@ async def start_game():
 
     gm.select_game(current_story_index)
     game_over = False
-    return "\n\n".join(gm.current_story)
+    return "\n\n".join(gm.current_story), gm.get_story_status(conclusion=False)
 
 async def next_action(action):
     global game_over
@@ -35,7 +35,7 @@ async def next_action(action):
         else:
             update = (gr.update(value=""), gr.update(interactive=True))
 
-        return "\n\n".join(gm.current_story), *update
+        return "\n\n".join(gm.current_story), gm.get_story_status(conclusion=False), *update
 
 async def reset_game():
     gm.reset_game()
@@ -51,11 +51,15 @@ with gr.Blocks(theme="citrus") as ui:
     submit_btn = gr.Button("Next")
     reset_btn = gr.Button("Reset Game")
 
+    status_display = gr.Textbox(label="Status", lines=10, interactive=False)
+
     user_input.submit(fn=next_action, inputs=user_input, outputs=[story_display, user_input])
-    submit_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=next_action, inputs=user_input, outputs=[story_display, user_input, submit_btn]).then(fn=lambda: gr.update(interactive=True), outputs=[reset_btn])
+    submit_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=next_action, inputs=user_input, outputs=[story_display, status_display, user_input, submit_btn]).then(fn=lambda: gr.update(interactive=True), outputs=[reset_btn])
     reset_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=reset_game, outputs=story_display).then(fn=lambda: (gr.update(value="Next", interactive=True), gr.update(interactive=True), gr.update(interactive=True)), outputs=[submit_btn, reset_btn, user_input])
 
     start_game_task = asyncio.run(start_game())
-    story_display.value = start_game_task
+    story_display.value = start_game_task[0]
+    status_display.value = start_game_task[1]
+
 
 ui.launch()

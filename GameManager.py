@@ -354,22 +354,22 @@ class GameManager:
         ])).choices[0].message.content
 
     def get_story_status(self, conclusion=True):
-        status = f"Player Character:\n\nname: {self.player_data['name']}\nlocation: {self.player_data['location']}\ndescription: {self.player_data['description']}"
+        status = f"Player Character:\n\tName: {self.player_data['name']}\n\tLocation: {self.player_data['location']}\n\tDescription: {self.player_data['description']}"
         if len(self.player_data['inventory']) > 0:
-            status += f"\nPlayer Inventory:"
+            status += f"\n\tPlayer Inventory:"
             for item in self.player_data['inventory']:
-                status += f"\n\tname: {item.get('name', item.get('item', 'Unknown'))}\n\tdescription: {item['description']}"
+                status += f"\n\t\tName: {item.get('name', item.get('item', 'Unknown'))}\n\t\tDescription: {item['description']}"
 
         status += f"\n\nStory Setting: {self.map_data['name']}"
         for i in range(len(self.map_data["locations"])):
             location = self.map_data["locations"][i]
-            status += f"\n\nlocation {i+1}: {location['name']}\nrelative area: {location['area']}\ndescription: {location['description']}"
+            status += f"\n\nLocation {i+1}: {location['name']}\n\tRelative area: {location['area']}\n\tDescription: {location['description']}"
 
         if len(self.items) > 0:
             status += "\n\nObjects outside player inventory:"
             for i in range(len(self.items)):
                 item = self.items[i]
-                item_report = f"\n\nobject {i+1}: {'item'}\nlocation: {item['location']}\ndescription: {item['description']}"
+                item_report = f"\n\nObject {i+1}: {item["name"]}\n\tLocation: {item['location']}\n\tDescription: {item['description']}"
 
                 status += item_report
 
@@ -377,7 +377,7 @@ class GameManager:
             status += "\n\nCharacters:"
             for i in range(len(self.characters)):
                 character = self.characters[i]
-                status += f"\n\ncharacter {i+1}: {character['name']}\nlocation: {character['location']}\ndescription: {character['description']}"
+                status += f"\n\nCharacter {i+1}: {character['name']}\n\tlocation: {character['location']}\n\tdescription: {character['description']}"
 
         if conclusion:
             status += f"\n\nIntended Conclusion: \n```{self._conclusion}```"
