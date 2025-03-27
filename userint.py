@@ -45,15 +45,17 @@ with gr.Blocks(theme="citrus") as ui:
 
     gr.Markdown("# Wait, That Was an Option?")
 
-    story_display = gr.Textbox(label="Story", lines=10, interactive=False)
+    with gr.Row(equal_height=True):
+        story_display = gr.Textbox(label="Story", lines=20, interactive=False)
+        status_display = gr.Textbox(label="Status", lines=20, interactive=False)
+
     user_input = gr.Textbox(label="Your Action")
+    with gr.Row():
+        submit_btn = gr.Button("Next")
+        reset_btn = gr.Button("Reset Game")
 
-    submit_btn = gr.Button("Next")
-    reset_btn = gr.Button("Reset Game")
 
-    status_display = gr.Textbox(label="Status", lines=10, interactive=False)
-
-    user_input.submit(fn=next_action, inputs=user_input, outputs=[story_display, user_input])
+    user_input.submit(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=next_action, inputs=user_input, outputs=[story_display, status_display, user_input, submit_btn]).then(fn=lambda: gr.update(interactive=True), outputs=[reset_btn])
     submit_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=next_action, inputs=user_input, outputs=[story_display, status_display, user_input, submit_btn]).then(fn=lambda: gr.update(interactive=True), outputs=[reset_btn])
     reset_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=reset_game, outputs=[story_display, status_display]).then(fn=lambda: (gr.update(value="Next", interactive=True), gr.update(interactive=True), gr.update(interactive=True)), outputs=[submit_btn, reset_btn, user_input])
 
