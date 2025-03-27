@@ -358,7 +358,7 @@ class GameManager:
         if len(self.player_data['inventory']) > 0:
             status += f"\n\tPlayer Inventory:"
             for item in self.player_data['inventory']:
-                status += f"\n\t\tName: {item.get('name', item.get('item', 'Unknown'))}\n\t\tDescription: {item['description']}"
+                status += f"\n\t\tItem: {item.get('name', item.get('item', 'Unknown'))}\n\t\tDescription: {item['description']}"
 
         status += f"\n\nStory Setting: {self.map_data['name']}"
         for i in range(len(self.map_data["locations"])):

@@ -55,7 +55,7 @@ with gr.Blocks(theme="citrus") as ui:
 
     user_input.submit(fn=next_action, inputs=user_input, outputs=[story_display, user_input])
     submit_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=next_action, inputs=user_input, outputs=[story_display, status_display, user_input, submit_btn]).then(fn=lambda: gr.update(interactive=True), outputs=[reset_btn])
-    reset_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=reset_game, outputs=story_display).then(fn=lambda: (gr.update(value="Next", interactive=True), gr.update(interactive=True), gr.update(interactive=True)), outputs=[submit_btn, reset_btn, user_input])
+    reset_btn.click(fn=lambda: (gr.update(interactive=False), gr.update(interactive=False)), outputs=[submit_btn, reset_btn]).then(fn=reset_game, outputs=[story_display, status_display]).then(fn=lambda: (gr.update(value="Next", interactive=True), gr.update(interactive=True), gr.update(interactive=True)), outputs=[submit_btn, reset_btn, user_input])
 
     start_game_task = asyncio.run(start_game())
     story_display.value = start_game_task[0]
