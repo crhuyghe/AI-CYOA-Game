@@ -25,7 +25,7 @@ class GameManager:
     def select_game(self, index):
         """Sets the story index and performs initialization steps"""
         running_data = copy.deepcopy(self._story_data[index])
-        self.action_number = 2
+        self.action_number = 5
 
         self.current_story.append(running_data["introduction"])
         self.map_data = running_data["map"]
